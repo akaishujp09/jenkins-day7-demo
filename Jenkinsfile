@@ -4,32 +4,32 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                echo 'Pulling code from Git'
+                echo 'Code pulled from Git'
             }
         }
 
-        stage('Build') {
+        stage('Maven Build') {
             steps {
-                sh 'echo Building application'
+                sh 'mvn clean package'
             }
         }
 
-        stage('Test') {
+        stage('Verify Package') {
             steps {
-                sh 'echo Running test cases'
+                sh '''
+                echo "Checking target folder"
+                ls -ltr target/
+                '''
             }
         }
+    }
 
-        stage('Package') {
-            steps {
-                sh 'echo Creating package'
-            }
+    post {
+        success {
+            echo 'Maven build successful'
         }
-
-        stage('Deploy') {
-            steps {
-                sh 'echo Deploying application'
-            }
+        failure {
+            echo 'Maven build failed'
         }
     }
 }
