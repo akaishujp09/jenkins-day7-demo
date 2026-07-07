@@ -4,25 +4,31 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                echo 'Code checkout completed'
+                echo 'Pulling code from Git'
             }
         }
 
         stage('Build') {
             steps {
-                echo 'Build started'
+                sh 'echo Building application'
             }
         }
 
         stage('Test') {
             steps {
-                echo 'Testing completed'
+                sh 'echo Running test cases'
+            }
+        }
+
+        stage('Package') {
+            steps {
+                sh 'echo Creating package'
             }
         }
 
         stage('Deploy') {
             steps {
-                echo 'Deployment completed'
+                sh 'echo Deploying application'
             }
         }
     }
