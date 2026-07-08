@@ -1,41 +1,35 @@
 pipeline {
     agent any
 
-    environment {
-        JAVA_HOME = '/usr/lib/jvm/java-21-amazon-corretto.x86_64'
-        PATH = "${JAVA_HOME}/bin:${env.PATH}"
-    }
-
     stages {
-        stage('Check Java and Maven') {
+        stage('Check Docker') {
             steps {
                 sh '''
-                java -version
-                mvn -version
+                echo "Checking Docker version"
+                docker version
                 '''
             }
         }
 
-        stage('Maven Build') {
+        stage('Build Docker Image') {
             steps {
-                sh 'mvn clean package'
+                sh 'docker build -t my-web-app:v1 .'
             }
         }
 
-        stage('Verify Package') {
+        stage('Check Image') {
             steps {
-                sh 'ls -ltr target/'
+                sh 'docker images | grep my-web-app'
             }
         }
     }
 
     post {
         success {
-            archiveArtifacts artifacts: 'target/*.jar', fingerprint: true
-            echo 'Maven build successful'
+            echo 'Docker image build successful'
         }
         failure {
-            echo 'Maven build failed'
+            echo 'Docker image build failed'
         }
     }
 }
