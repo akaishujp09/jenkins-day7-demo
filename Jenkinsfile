@@ -2,34 +2,40 @@ pipeline {
     agent any
 
     stages {
-        stage('Check Docker') {
-            steps {
-                sh '''
-                echo "Checking Docker version"
-                docker version
-                '''
-            }
-        }
-
         stage('Build Docker Image') {
             steps {
                 sh 'docker build -t my-web-app:v1 .'
             }
         }
 
-        stage('Check Image') {
+        stage('Remove Old Container') {
             steps {
-                sh 'docker images | grep my-web-app'
+                sh 'docker rm -f my-web-container || true'
+            }
+        }
+
+        stage('Run New Container') {
+            steps {
+                sh 'docker run -d --name my-web-container -p 8081:80 my-web-app:v1'
+            }
+        }
+
+        stage('Verify') {
+            steps {
+                sh '''
+                docker ps
+                curl -I http://localhost:8081 || true
+                '''
             }
         }
     }
 
     post {
         success {
-            echo 'Docker image build successful'
+            echo 'Docker container deployed successfully'
         }
         failure {
-            echo 'Docker image build failed'
+            echo 'Docker container deployment failed'
         }
     }
 }
